@@ -1,0 +1,27 @@
+ImportError: libhdf5_serial.so.103: cannot open shared object file: No such file or directory
+libhdf5-dev
+
+ImportError: libcblas.so.3: cannot open shared object file: No such file or directory
+sudo apt-get install libatlas-base-dev
+
+ImportError: libjasper.so.1: cannot open shared object file: No such file or directory
+sudo apt-get install libjasper-dev
+
+ImportError: libQtGui.so.4: cannot open shared object file: No such file or directory
+sudo apt-get install libqtgui4
+
+ImportError: libQTtest.so.4:cannot open shared object file:no such file or directory
+sudo apt install libqt4-test
+
+
+pi@raspberrypi:~ $ pip3 install opencv-contrib-python==3.4.10.35
+Looking in indexes: https://pypi.org/simple, https://www.piwheels.org/simple
+Collecting opencv-contrib-python==3.4.10.35
+  Could not find a version that satisfies the requirement opencv-contrib-python==3.4.10.35 (from versions: 3.4.2.16, 3.4.2.17, 3.4.3.18, 3.4.4.19, 3.4.6.27, 3.4.7.28, 4.0.1.24, 4.1.0.25, 4.1.1.26)
+No matching distribution found for opencv-contrib-python==3.4.10.35
+
+# OpenCV on Raspbian Buster (2020-05-27-raspios-buster-full-armhf.zip) without problem in import cv2:
+pip3 install opencv-contrib-python==3.4.6.27
+
+# TensorFlow Lite for Raspberry Pi
+pip3 install https://dl.google.com/coral/python/tflite_runtime-2.1.0.post1-cp37-cp37m-linux_armv7l.whl
