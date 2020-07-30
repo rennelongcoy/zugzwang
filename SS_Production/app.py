@@ -14,12 +14,17 @@ import chess.svg
 import numpy as np
 import cairosvg
 import cv2
+import io
+import PIL
+
+cap = cv2.VideoCapture(0)
 
 print("zugzwang v0.01")
 print("chess.__version__    = " + chess.__version__)
 print("numpy.__version__    = " + np.__version__)
 print("cairosvg.__version__ = " + cairosvg.__version__)
 print("cv2.__version__      = " + cv2.__version__)
+print("PIL.__version__      = " + PIL.__version__)
 
 # ChessGame class
 board = chess.Board()
@@ -89,11 +94,11 @@ def executeMove(move):
 print("Turn = " + ("White" if board.turn else "Black"))
 
 # Move 1
-prev_state = initial_state
 # Sample move of White, populate by row from White side as 1st row
 # Below is d2d4 move
 # Should be from BoardState class
 # TODO: Infer from video frame by using TF Lite model
+'''prev_state = initial_state
 current_state = np.array([[ 1,  1,  1,  1,  1,  1,  1,  1],
                           [ 1,  1,  1,  0,  1,  1,  1,  1],
                           [ 0,  0,  0,  0,  0,  0,  0,  0],
@@ -108,12 +113,13 @@ start_square = getStartSquare(state_diff)
 dest_square = getDestSquare(state_diff)
 move = convertToChessMove(start_square, dest_square)
 executeMove(move)
-print("Turn = " + ("White" if board.turn else "Black"))
+print("Turn = " + ("White" if board.turn else "Black"))'''
 
 # Move 2
-prev_state = current_state
 # Sample move of White, populate by row from White side as 1st row
 # Below is Nc6 move
+# TODO: Infer from video frame by using TF Lite model
+'''prev_state = current_state
 current_state = np.array([[ 1,  1,  1,  1,  1,  1,  1,  1],
                           [ 1,  1,  1,  0,  1,  1,  1,  1],
                           [ 0,  0,  0,  0,  0,  0,  0,  0],
@@ -128,4 +134,47 @@ start_square = getStartSquare(state_diff)
 dest_square = getDestSquare(state_diff)
 move = convertToChessMove(start_square, dest_square)
 executeMove(move)
+print("Turn = " + ("White" if board.turn else "Black"))'''
+
 print("Turn = " + ("White" if board.turn else "Black"))
+print("Press 'q' to quit. Press ' ' to make a move.")
+prev_state = initial_state
+while(True):
+    # Capture frame-by-frame
+    ret, frame = cap.read()
+    raw_sample_frame = frame.copy()
+
+    # Overlay a red 400x400 square to match with real-world Chess board dimension
+    frame_overlay = cv2.rectangle(frame, (121, 41), (520, 440), (0, 0, 255), 1)
+
+    # Display the resulting frame
+    cv2.imshow('Data Gathering', frame_overlay)
+
+    key = cv2.waitKey(1) & 0xFF
+    if key == ord('q'):
+        break
+    elif key == ord(' '):
+        # TODO: Split current frame to 8x8 individual squares
+        # TODO: Infer piece in each square by using TF Lite model (start from Rank A to Rank H)
+        # Below is d2d4 move
+        current_state = np.array([[ 1,  1,  1,  1,  1,  1,  1,  1],  # Rank A
+                                  [ 1,  1,  1,  0,  1,  1,  1,  1],  # Rank B
+                                  [ 0,  0,  0,  0,  0,  0,  0,  0],  # Rank C
+                                  [ 0,  0,  0,  1,  0,  0,  0,  0],  # Rank D
+                                  [ 0,  0,  0,  0,  0,  0,  0,  0],  # Rank E
+                                  [ 0,  0,  0,  0,  0,  0,  0,  0],  # Rank F
+                                  [-1, -1, -1, -1, -1, -1, -1, -1],  # Rank G
+                                  [-1, -1, -1, -1, -1, -1, -1, -1]]) # Rank H
+
+        state_diff = getBoardStateDiff(current_state, prev_state)
+        start_square = getStartSquare(state_diff)
+        dest_square = getDestSquare(state_diff)
+        move = convertToChessMove(start_square, dest_square)
+        executeMove(move)
+        prev_state = current_state
+        print("Turn = " + ("White" if board.turn else "Black"))
+        print("Press 'q' to quit. Press ' ' to make a move.")
+
+# When everything done, release the capture
+cap.release()
+cv2.destroyAllWindows()
