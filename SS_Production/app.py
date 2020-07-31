@@ -116,7 +116,7 @@ def executeMove(move):
   board.push(move)
 
 # White's turn
-print("Turn = " + ("White" if board.turn else "Black"))
+#print("Turn = " + ("White" if board.turn else "Black"))
 
 # Move 1
 # Sample move of White, populate by row from White side as 1st row
@@ -164,6 +164,16 @@ print("Turn = " + ("White" if board.turn else "Black"))'''
 print("Turn = " + ("White" if board.turn else "Black"))
 print("Press 'q' to quit. Press ' ' to make a move.")
 prev_state = initial_state
+
+temp = np.array([[ 0,  0,  0,  0,  0,  0,  0,  0],
+                          [ 0,  0,  0,  0,  0,  0,  0,  0],
+                          [ 0,  0,  0,  0,  0,  0,  0,  0],
+                          [ 0,  0,  0,  0,  0,  0,  0,  0],
+                          [ 0,  0,  0,  0,  0,  0,  0,  0],
+                          [ 0,  0,  0,  0,  0,  0,  0,  0],
+                          [ 0,  0,  0,  0,  0,  0,  0,  0],
+                          [ 0,  0,  0,  0,  0,  0,  0,  0]])
+
 while(True):
     # Capture frame-by-frame
     ret, frame = cap.read()
@@ -180,16 +190,34 @@ while(True):
     if key == ord('q'):
         break
     elif key == ord(' '):
-        i = 0
-        j = 0
         cv_img_400x400 = raw_sample_frame[40:440, 120:520]
-        #one_square = cv_img_400x400[i:i+50, j:j+50, :]
-        one_square = np.expand_dims(cv_img_400x400[i:i+50, j:j+50, :], axis=0)
-        interpreter.set_tensor(input_details[0]['index'], one_square)
-        interpreter.invoke()
-        output_data = interpreter.get_tensor(output_details[0]['index'])
-        results = np.squeeze(output_data)
-        print(results)
+        for i in range(0, 351, 50):
+            for j in range(0, 351, 50):
+                one_square = np.expand_dims(cv_img_400x400[i:i+50, j:j+50, :], axis=0)
+                interpreter.set_tensor(input_details[0]['index'], one_square)
+                interpreter.invoke()
+                output_data = interpreter.get_tensor(output_details[0]['index'])
+                results = np.round(np.squeeze(output_data))
+                #print(results)
+                if results[0] == 1:
+                    temp[i//50, j//50] = -1 # black
+                elif results[1] == 1:
+                    temp[i//50, j//50] = 0  # empty
+                elif results[2] == 1:
+                    temp[i//50, j//50] = 1  # white
+        print(temp)
+        temp = np.rot90(m=temp, k=3)
+        print(temp)
+        current_state = np.flipud(temp)
+        print(current_state)
+
+        state_diff = getBoardStateDiff(current_state, prev_state)
+        start_square = getStartSquare(state_diff)
+        dest_square = getDestSquare(state_diff)
+        move = convertToChessMove(start_square, dest_square)
+        executeMove(move)
+        prev_state = current_state
+
         # TODO: Split current frame to 8x8 individual squares
         # TODO: Infer piece in each square by using TF Lite model (start from Rank A to Rank H)
         # Below is d2d4 move
