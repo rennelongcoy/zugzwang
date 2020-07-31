@@ -16,15 +16,40 @@ import cairosvg
 import cv2
 import io
 import PIL
+import tflite_runtime
+import tflite_runtime.interpreter as tflite
+
+interpreter = tflite.Interpreter(model_path="model.tflite")
+interpreter.allocate_tensors()
+
+input_details = interpreter.get_input_details()
+output_details = interpreter.get_output_details()
+
+print(input_details[0]['dtype'])
+count = input_details[0]['shape'][0] # Only 1 image to be input
+height = input_details[0]['shape'][1]
+width = input_details[0]['shape'][2]
+depth = input_details[0]['shape'][3]
+print("Expected input count  = " + str(count))
+print("Expected input height = " + str(height))
+print("Expected input width  = " + str(width))
+print("Expected input depth  = " + str(depth))
+
+print(output_details[0]['dtype'])
+rows = output_details[0]['shape'][0]
+cols = output_details[0]['shape'][1]
+print("Expected output rows = " + str(rows))
+print("Expected output cols  = " + str(cols))
 
 cap = cv2.VideoCapture(0)
 
 print("zugzwang v0.01")
-print("chess.__version__    = " + chess.__version__)
-print("numpy.__version__    = " + np.__version__)
-print("cairosvg.__version__ = " + cairosvg.__version__)
-print("cv2.__version__      = " + cv2.__version__)
-print("PIL.__version__      = " + PIL.__version__)
+print("chess.__version__          = " + chess.__version__)
+print("numpy.__version__          = " + np.__version__)
+print("cairosvg.__version__       = " + cairosvg.__version__)
+print("cv2.__version__            = " + cv2.__version__)
+print("PIL.__version__            = " + PIL.__version__)
+print("tflite_runtime.__version__ = " + tflite_runtime.__version__)
 
 # ChessGame class
 board = chess.Board()
@@ -142,22 +167,33 @@ prev_state = initial_state
 while(True):
     # Capture frame-by-frame
     ret, frame = cap.read()
-    raw_sample_frame = frame.copy()
+    raw_sample_frame = frame.copy().astype(np.float32)
+    #print(type(raw_sample_frame))
 
     # Overlay a red 400x400 square to match with real-world Chess board dimension
     frame_overlay = cv2.rectangle(frame, (121, 41), (520, 440), (0, 0, 255), 1)
 
     # Display the resulting frame
-    cv2.imshow('Data Gathering', frame_overlay)
+    cv2.imshow('Zugzwang', frame_overlay)
 
     key = cv2.waitKey(1) & 0xFF
     if key == ord('q'):
         break
     elif key == ord(' '):
+        i = 0
+        j = 0
+        cv_img_400x400 = raw_sample_frame[40:440, 120:520]
+        #one_square = cv_img_400x400[i:i+50, j:j+50, :]
+        one_square = np.expand_dims(cv_img_400x400[i:i+50, j:j+50, :], axis=0)
+        interpreter.set_tensor(input_details[0]['index'], one_square)
+        interpreter.invoke()
+        output_data = interpreter.get_tensor(output_details[0]['index'])
+        results = np.squeeze(output_data)
+        print(results)
         # TODO: Split current frame to 8x8 individual squares
         # TODO: Infer piece in each square by using TF Lite model (start from Rank A to Rank H)
         # Below is d2d4 move
-        current_state = np.array([[ 1,  1,  1,  1,  1,  1,  1,  1],  # Rank A
+        '''current_state = np.array([[ 1,  1,  1,  1,  1,  1,  1,  1],  # Rank A
                                   [ 1,  1,  1,  0,  1,  1,  1,  1],  # Rank B
                                   [ 0,  0,  0,  0,  0,  0,  0,  0],  # Rank C
                                   [ 0,  0,  0,  1,  0,  0,  0,  0],  # Rank D
@@ -171,7 +207,7 @@ while(True):
         dest_square = getDestSquare(state_diff)
         move = convertToChessMove(start_square, dest_square)
         executeMove(move)
-        prev_state = current_state
+        prev_state = current_state'''
         print("Turn = " + ("White" if board.turn else "Black"))
         print("Press 'q' to quit. Press ' ' to make a move.")
 
