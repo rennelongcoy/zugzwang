@@ -19,7 +19,7 @@ import PIL
 import tflite_runtime
 import tflite_runtime.interpreter as tflite
 
-interpreter = tflite.Interpreter(model_path="model.tflite")
+interpreter = tflite.Interpreter(model_path="model/model.tflite")
 interpreter.allocate_tensors()
 
 input_details = interpreter.get_input_details()
@@ -177,7 +177,7 @@ temp = np.array([[ 0,  0,  0,  0,  0,  0,  0,  0],
 while(True):
     # Capture frame-by-frame
     ret, frame = cap.read()
-    raw_sample_frame = frame.copy().astype(np.float32)
+    raw_sample_frame = np.float32(frame.copy())
     #print(type(raw_sample_frame))
 
     # Overlay a red 400x400 square to match with real-world Chess board dimension
@@ -187,9 +187,9 @@ while(True):
     cv2.imshow('Zugzwang', frame_overlay)
 
     key = cv2.waitKey(1) & 0xFF
-    if key == ord('q') or key == 27:
+    if key == 27: # Esc key
         break
-    elif key == ord(' '):
+    elif key == ord(' '): # Space bar key
         # Size (HxWxD) = (50x50x3)
         cv_img_400x400 = raw_sample_frame[40:440, 120:520]
         # Split current frame to 8x8 individual squares
