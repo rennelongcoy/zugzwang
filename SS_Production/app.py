@@ -162,7 +162,7 @@ executeMove(move)
 print("Turn = " + ("White" if board.turn else "Black"))'''
 
 print("Turn = " + ("White" if board.turn else "Black"))
-print("Press 'q' to quit. Press ' ' to make a move.")
+print("Press 'esc' to quit. Press ' ' to make a move.")
 prev_state = initial_state
 
 temp = np.array([[ 0,  0,  0,  0,  0,  0,  0,  0],
@@ -181,19 +181,24 @@ while(True):
     #print(type(raw_sample_frame))
 
     # Overlay a red 400x400 square to match with real-world Chess board dimension
-    frame_overlay = cv2.rectangle(frame, (121, 41), (520, 440), (0, 0, 255), 1)
+    frame_overlay = cv2.rectangle(frame, (120, 40), (520 - 1, 440 - 1), (0, 0, 255), 1)
 
     # Display the resulting frame
     cv2.imshow('Zugzwang', frame_overlay)
 
     key = cv2.waitKey(1) & 0xFF
-    if key == ord('q'):
+    if key == ord('q') or key == 27:
         break
     elif key == ord(' '):
+        # Size (HxWxD) = (50x50x3)
         cv_img_400x400 = raw_sample_frame[40:440, 120:520]
+        # Split current frame to 8x8 individual squares
         for i in range(0, 351, 50):
             for j in range(0, 351, 50):
+                # Add N dim to be (NxHxWxD) = (1x50x50x3)
                 one_square = np.expand_dims(cv_img_400x400[i:i+50, j:j+50, :], axis=0)
+
+                # Infer piece color in each square by using TF Lite model (start from Rank A to Rank H)
                 interpreter.set_tensor(input_details[0]['index'], one_square)
                 interpreter.invoke()
                 output_data = interpreter.get_tensor(output_details[0]['index'])
@@ -206,8 +211,10 @@ while(True):
                 elif results[2] == 1:
                     temp[i//50, j//50] = 1  # white
         print(temp)
+        # Rotate 90-degrees clockwise thrice
         temp = np.rot90(m=temp, k=3)
         print(temp)
+        # Flip in up-down direction to match initial_state
         current_state = np.flipud(temp)
         print(current_state)
 
@@ -218,8 +225,6 @@ while(True):
         executeMove(move)
         prev_state = current_state
 
-        # TODO: Split current frame to 8x8 individual squares
-        # TODO: Infer piece in each square by using TF Lite model (start from Rank A to Rank H)
         # Below is d2d4 move
         '''current_state = np.array([[ 1,  1,  1,  1,  1,  1,  1,  1],  # Rank A
                                   [ 1,  1,  1,  0,  1,  1,  1,  1],  # Rank B
@@ -237,7 +242,7 @@ while(True):
         executeMove(move)
         prev_state = current_state'''
         print("Turn = " + ("White" if board.turn else "Black"))
-        print("Press 'q' to quit. Press ' ' to make a move.")
+        print("Press 'esc' to quit. Press ' ' to make a move.")
 
 # When everything done, release the capture
 cap.release()
