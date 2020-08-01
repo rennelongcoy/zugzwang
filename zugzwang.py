@@ -189,7 +189,7 @@ while(True):
     key = cv2.waitKey(1) & 0xFF
     if key == 27: # Esc key
         break
-    elif key == ord(' '): # Space bar key
+    elif key == ord(' '): # Space bar
         # Size (HxWxD) = (50x50x3)
         cv_img_400x400 = raw_sample_frame[40:440, 120:520]
         # Split current frame to 8x8 individual squares
