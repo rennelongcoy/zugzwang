@@ -1,10 +1,14 @@
 # zugzwang
 
-A Python3-based Chess game recording system using OpenCV deployed in a Raspberry Pi. 
-
-Convolutional Neural Network model training with TensorFlow and Keras
-
-Inference via TensorFlow Lite on Raspberry Pi 2 + Logicool C922n
+A Python3-based Chess game recording system using OpenCV and TensorFlow deployed in a Raspberry Pi.
+- Training
+    - Uses a Convolutional Neural Network with TensorFlow 2 and Keras APIs.
+    - Image input size = 50x50x3 RBG image
+- Inference
+    - Uses TensorFlow Lite on Raspberry Pi 2 + Logicool C922n to classify each Chess board square into three categories:
+        - A square with white piece
+        - A square with no piece
+        - A square with black piece
 
 ## Table of Contents
 
@@ -46,14 +50,18 @@ Inference via TensorFlow Lite on Raspberry Pi 2 + Logicool C922n
 - https://hub.docker.com/r/tensorflow/tensorflow/
 - docker pull tensorflow/tensorflow:latest-jupyter
 - docker run -it --rm -v /c/app:/tf/zugzwang -p 8888:8888 tensorflow/tensorflow:latest-jupyter
-Example:
+    - Example:
 ![Sample Docker Container bootup](./docs/docker_container_bootup.png)
 
 ### TensorFlow Jupyter Notebook
 
 - http://192.168.99.100:8888/tree
-- To access the notebook, open this link in a browser:
+- To access the notebook for the first time, open link in a web browser with the following format:
 http://192.168.99.100:8888/?token=replace_this_with_actual_token_value
+    - For the example above, open this link in a web browser:\
+    http://192.168.99.100:8888/?token=6757e503380afc7649c95c83b6dd6d1d0e7f25cada72e86b
+    - Note:\
+    The token will change on every start of the TensorFlow Docker container.
 
 ---
 
