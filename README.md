@@ -1,23 +1,21 @@
 # zugzwang
 
-A Python3-based Chess game recording system using OpenCV and TensorFlow deployed in a Raspberry Pi.
-- Training
-    - Uses a Convolutional Neural Network with TensorFlow 2 and Keras APIs.
-    - Image input size = 50x50x3 RBG image
-- Inference
-    - Uses TensorFlow Lite on Raspberry Pi 2 + Logicool C922n to classify each Chess board square into three categories:
-        - A square with white piece
-        - A square with no piece
-        - A square with black piece
+A real-time machine learning-based Chess game recording system using Python3, OpenCV, and TensorFlow 2 deployed in a Raspberry Pi.
 
 ## Table of Contents
 
+- [System Architecture Overview](#system-architecture-overview)
 - [Hardware Setup](#hardware-setup)
 - [Software Installations](#software-installations)
 - [Official TensorFlow Docker Image](#official-tensorflow-docker-image)
 - [TensorFlow Jupyter Notebook](#tensorflow-jupyter-notebook)
+- [Machine Learning Model](#machine-learning-model)
 
 ---
+
+## System Architecture Overview
+
+TODO
 
 ## Hardware Setup
 
@@ -45,7 +43,7 @@ A Python3-based Chess game recording system using OpenCV and TensorFlow deployed
 | Docker Toolbox | https://docs.docker.com/toolbox/toolbox_install_windows/ |
 | VNC Viewer | https://www.realvnc.com/en/connect/download/viewer/ |
 
-### Official TensorFlow Docker Image
+## Official TensorFlow Docker Image
 
 - https://hub.docker.com/r/tensorflow/tensorflow/
 - docker pull tensorflow/tensorflow:latest-jupyter
@@ -53,7 +51,7 @@ A Python3-based Chess game recording system using OpenCV and TensorFlow deployed
     - Example:
 ![Sample Docker Container bootup](./docs/docker_container_bootup.png)
 
-### TensorFlow Jupyter Notebook
+## TensorFlow Jupyter Notebook
 
 - http://192.168.99.100:8888/tree
 - To access the notebook for the first time, open link in a web browser with the following format:
@@ -62,6 +60,17 @@ http://192.168.99.100:8888/?token=replace_this_with_actual_token_value
     http://192.168.99.100:8888/?token=6757e503380afc7649c95c83b6dd6d1d0e7f25cada72e86b
     - Note:\
     The token will change on every start of the TensorFlow Docker container.
+
+## Machine Learning Model
+
+- Training
+    - Uses a Convolutional Neural Network with TensorFlow 2 and Keras APIs.
+    - Image input size = 50x50x3 RBG image
+- Inference
+    - Uses TensorFlow Lite on Raspberry Pi 2 + Logicool C922n to classify each Chess board square into three categories:
+        - A square with white piece
+        - A square with no piece
+        - A square with black piece
 
 ---
 
