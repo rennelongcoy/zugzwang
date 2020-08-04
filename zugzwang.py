@@ -187,7 +187,7 @@ while(True):
             #print("\n")
         prev_state = current_state
 
-        cv2.imwrite("/zugzwang/saved_games/temp.jpg", frame_overlay)
+        cv2.imwrite("/zugzwang/games/temp.jpg", frame_overlay)
 
         #print("Turn = " + ("White" if board.turn else "Black"))
         #print("Press 'esc' to quit. Press ' ' to make a move.")
