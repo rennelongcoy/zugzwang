@@ -5,7 +5,7 @@ A real-time machine learning-based Chess game recording system using Python3, Op
 
 ## Table of Contents
 
-- [Demonstration](#demonstration-scholars-mate)
+- [Demonstration (Scholar's Mate)](#demonstration-scholars-mate)
 - [System Architecture Overview](#system-architecture-overview)
 - [Hardware Setup](#hardware-setup)
 - [Software Installations](#software-installations)
