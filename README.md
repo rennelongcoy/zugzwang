@@ -1,9 +1,11 @@
 # zugzwang
 
-A real-time machine learning-based Chess game recording system using Python3, OpenCV, and TensorFlow 2 deployed in a Raspberry Pi.
+A real-time machine learning-based Chess game recording system using Python3, OpenCV, and TensorFlow 2 deployed in a Raspberry Pi.\
+*(For definition of "zugzwang" in terms of Chess, kindly visit https://en.wikipedia.org/wiki/Zugzwang)*
 
 ## Table of Contents
 
+- [Demonstration](#demonstration-scholars-mate)
 - [System Architecture Overview](#system-architecture-overview)
 - [Hardware Setup](#hardware-setup)
 - [Software Installations](#software-installations)
@@ -12,6 +14,19 @@ A real-time machine learning-based Chess game recording system using Python3, Op
 - [Machine Learning Model](#machine-learning-model)
 
 ---
+
+## Demonstration (Scholar's Mate)
+
+The following screenshots show the final position in a Scholar's Mate in a games of Chess.\
+For more information on the Scholar's Mate, kindly visit: https://en.wikipedia.org/wiki/Scholar%27s_mate
+
+- Scholar's Mate (Checkmate Position)
+
+![Scholar's Mate](./demo_games/Scholar's Mate/move4-1.jpg)
+
+- Scholar's Mate Game Record (using Standard Algebraic Notation)
+
+![Scholar's Mate Game Record](./demo_games/Scholar's Mate/scholar's_mate.png)
 
 ## System Architecture Overview
 
@@ -65,7 +80,8 @@ http://192.168.99.100:8888/?token=replace_this_with_actual_token_value
 
 - Training
     - Uses a Convolutional Neural Network with TensorFlow 2 and Keras APIs.
-    - Image input size = 50x50x3 RBG image
+    - Input = 50x50x3 RBG image
+    - Output = 3-class softmax layer
 - Inference
     - Uses TensorFlow Lite on Raspberry Pi 2 + Logicool C922n to classify each Chess board square into three categories:
         - A square with white piece
