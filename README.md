@@ -22,11 +22,11 @@ For more information on the Scholar's Mate, kindly visit: https://en.wikipedia.o
 
 - Scholar's Mate (Checkmate Position)
 
-![Scholar's Mate](./demo_games/Scholar's Mate/move4-1.jpg)
+![Scholar\'s Mate](./demo_games/Scholar\'s Mate/move4-1.jpg)
 
 - Scholar's Mate Game Record (using Standard Algebraic Notation)
 
-![Scholar's Mate Game Record](./demo_games/Scholar's Mate/scholar's_mate.png)
+![Scholar\'s Mate Game Record](./demo_games/Scholar\'s Mate/scholar\'s_mate.png)
 
 ## System Architecture Overview
 
