@@ -78,6 +78,8 @@ http://192.168.99.100:8888/?token=replace_this_with_actual_token_value
 
 ## Machine Learning Model
 
+- Convolutional Neural Network Architecture
+
 ![Machine Learning Model](./docs/nn.png)
 
 - Training
