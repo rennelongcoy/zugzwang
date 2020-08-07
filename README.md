@@ -78,6 +78,8 @@ http://192.168.99.100:8888/?token=replace_this_with_actual_token_value
 
 ## Machine Learning Model
 
+![Machine Learning Model](./docs/nn.svg)
+
 - Training
     - Uses a Convolutional Neural Network with TensorFlow 2 and Keras APIs.
     - Input = 50x50x3 RBG image
