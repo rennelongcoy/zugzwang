@@ -6,7 +6,7 @@ import tflite_runtime.interpreter as tflite
 
 class TfLiteModel:
     def __init__(self):
-        self.interpreter = tflite.Interpreter(model_path="/zugzwang/model/model.tflite")
+        self.interpreter = tflite.Interpreter(model_path="/zugzwang/training/model.tflite")
         self.interpreter.allocate_tensors()
         
         self.input_details = self.interpreter.get_input_details()
