@@ -5,22 +5,13 @@ import numpy as np
 import modules.constants as const
 import modules.tflite_model as tflite_model
 
-initial_state = np.array([[ 1,  1,  1,  1,  1,  1,  1,  1],  # Rank A
-                          [ 1,  1,  1,  1,  1,  1,  1,  1],  # Rank B
-                          [ 0,  0,  0,  0,  0,  0,  0,  0],  # Rank C
-                          [ 0,  0,  0,  0,  0,  0,  0,  0],  # Rank D
-                          [ 0,  0,  0,  0,  0,  0,  0,  0],  # Rank E
-                          [ 0,  0,  0,  0,  0,  0,  0,  0],  # Rank F
-                          [-1, -1, -1, -1, -1, -1, -1, -1],  # Rank G
-                          [-1, -1, -1, -1, -1, -1, -1, -1]]) # Rank H
-
 class BoardState:
     def __init__(self, board):
         self.board = board
         self.game = chess.pgn.Game()
         self.tflite_model = tflite_model.TfLiteModel()
-        self.prev_state = initial_state
-        self.current_state = initial_state
+        self.prev_state = np.array(const.INITIAL_BOARD_STATE)
+        self.current_state = np.array(const.INITIAL_BOARD_STATE)
         self.move_count = 1
 
     def getBoardStateDiff(self, raw_frame):
@@ -31,22 +22,15 @@ class BoardState:
         return state_diff
 
     def getBoardStateFromImage(self, raw_frame):
-        state_temp = np.array([[ 0,  0,  0,  0,  0,  0,  0,  0],
-                               [ 0,  0,  0,  0,  0,  0,  0,  0],
-                               [ 0,  0,  0,  0,  0,  0,  0,  0],
-                               [ 0,  0,  0,  0,  0,  0,  0,  0],
-                               [ 0,  0,  0,  0,  0,  0,  0,  0],
-                               [ 0,  0,  0,  0,  0,  0,  0,  0],
-                               [ 0,  0,  0,  0,  0,  0,  0,  0],
-                               [ 0,  0,  0,  0,  0,  0,  0,  0]])
+        state_temp = np.array(const.ZERO_BOARD_STATE)
 
         # Size (HxWxD) = (400x400x3)
-        img400x400 = raw_frame[40:440, 120:520]
+        img400x400 = raw_frame[const.ROI_TOP_SIDE:const.ROI_BOTTOM_SIDE, const.ROI_LEFT_SIDE:const.ROI_RIGHT_SIDE]
 
         # Split current frame to 64 individual squares
         # Infer piece color in each square by using TF Lite model
-        for i in range(0, 351, const.ONE_SQUARE_SIZE):
-            for j in range(0, 351, const.ONE_SQUARE_SIZE):
+        for i in range(0, const.EIGHTH_RANK, const.ONE_SQUARE_SIZE):
+            for j in range(0, const.EIGHTH_FILE, const.ONE_SQUARE_SIZE):
                 # Add N dimension to be (NxHxWxD) = (1x50x50x3)
                 one_square = np.expand_dims(img400x400[i:i+const.ONE_SQUARE_SIZE, j:j+const.ONE_SQUARE_SIZE, :], axis=0)
 
@@ -60,7 +44,6 @@ class BoardState:
         # Flip in up-down direction to match initial_state
         current_state = np.flipud(state_temp)
 
-        # print(current_state)
         return current_state
 
     def printMove(self, san_move):

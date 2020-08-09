@@ -4,6 +4,7 @@ import cv2
 
 import modules.board_move as board_move
 import modules.board_state as board_state
+import modules.constants as const
 
 print("zugzwang v0.01")
 
@@ -22,7 +23,11 @@ if __name__ == "__main__":
         raw_frame = np.float32(frame.copy())
 
         # Overlay a red 400x400 square to match with real-world Chess board dimension
-        frame_overlay = cv2.rectangle(frame, (120, 40), (520 - 1, 440 - 1), (0, 0, 255), 1)
+        frame_overlay = cv2.rectangle(frame,
+                                      const.OVERLAY_TOP_LEFT_POINT,
+                                      const.OVERLAY_BOTTOM_RIGHT_POINT,
+                                      const.OVERLAY_COLOR_BGR,
+                                      const.OVERLAY_THICKNESS)
 
         # Display the resulting frame
         cv2.imshow('Zugzwang v0.01', frame_overlay)
