@@ -2,8 +2,8 @@ import chess
 import numpy as np
 import cv2
 
-from modules import board_move
-from modules import board_state
+import modules.board_move as board_move
+import modules.board_state as board_state
 
 print("zugzwang v0.01")
 

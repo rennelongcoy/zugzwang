@@ -2,22 +2,25 @@ import chess
 import chess.pgn
 import numpy as np
 
-from .tflite_model import TfLiteModel
+import modules.constants as const
+import modules.tflite_model as tflite_model
+
+initial_state = np.array([[ 1,  1,  1,  1,  1,  1,  1,  1],  # Rank A
+                          [ 1,  1,  1,  1,  1,  1,  1,  1],  # Rank B
+                          [ 0,  0,  0,  0,  0,  0,  0,  0],  # Rank C
+                          [ 0,  0,  0,  0,  0,  0,  0,  0],  # Rank D
+                          [ 0,  0,  0,  0,  0,  0,  0,  0],  # Rank E
+                          [ 0,  0,  0,  0,  0,  0,  0,  0],  # Rank F
+                          [-1, -1, -1, -1, -1, -1, -1, -1],  # Rank G
+                          [-1, -1, -1, -1, -1, -1, -1, -1]]) # Rank H
 
 class BoardState:
     def __init__(self, board):
         self.board = board
         self.game = chess.pgn.Game()
-        self.tflite_model = TfLiteModel()
-        self.prev_state = np.array([[ 1,  1,  1,  1,  1,  1,  1,  1],  # Rank A
-                                    [ 1,  1,  1,  1,  1,  1,  1,  1],  # Rank B
-                                    [ 0,  0,  0,  0,  0,  0,  0,  0],  # Rank C
-                                    [ 0,  0,  0,  0,  0,  0,  0,  0],  # Rank D
-                                    [ 0,  0,  0,  0,  0,  0,  0,  0],  # Rank E
-                                    [ 0,  0,  0,  0,  0,  0,  0,  0],  # Rank F
-                                    [-1, -1, -1, -1, -1, -1, -1, -1],  # Rank G
-                                    [-1, -1, -1, -1, -1, -1, -1, -1]]) # Rank H
-        self.current_state = self.prev_state
+        self.tflite_model = tflite_model.TfLiteModel()
+        self.prev_state = initial_state
+        self.current_state = initial_state
         self.move_count = 1
 
     def getBoardStateDiff(self, raw_frame):
@@ -26,21 +29,6 @@ class BoardState:
         if self.board.turn == chess.BLACK:
             state_diff = -state_diff
         return state_diff
-
-    def update(self, move):
-        if self.move_count == 1 and self.board.turn == chess.WHITE:
-            self.node = self.game.add_variation(move)
-        else:
-            self.node = self.node.add_variation(move)
-        self.board.push(move)
-        self.prev_state = self.current_state
-
-    def printMove(self, san_move):
-        if (self.board.turn == chess.WHITE):
-            print("{:3}.   {:7}".format(self.move_count, san_move), end='', flush=True)
-        else:
-            print("{:7}".format(san_move))
-            self.move_count = self.move_count + 1
 
     def getBoardStateFromImage(self, raw_frame):
         state_temp = np.array([[ 0,  0,  0,  0,  0,  0,  0,  0],
@@ -57,13 +45,13 @@ class BoardState:
 
         # Split current frame to 64 individual squares
         # Infer piece color in each square by using TF Lite model
-        for i in range(0, 351, 50):
-            for j in range(0, 351, 50):
+        for i in range(0, 351, const.ONE_SQUARE_SIZE):
+            for j in range(0, 351, const.ONE_SQUARE_SIZE):
                 # Add N dimension to be (NxHxWxD) = (1x50x50x3)
-                one_square = np.expand_dims(img400x400[i:i+50, j:j+50, :], axis=0)
+                one_square = np.expand_dims(img400x400[i:i+const.ONE_SQUARE_SIZE, j:j+const.ONE_SQUARE_SIZE, :], axis=0)
 
                 # Classify piece color in the individual square
-                state_temp[i//50, j//50] = self.tflite_model.classifySquare(one_square)
+                state_temp[i//const.ONE_SQUARE_SIZE, j//const.ONE_SQUARE_SIZE] = self.tflite_model.classifySquare(one_square)
 
         # Rotate 90-degrees clockwise thrice if White is on right side
         # TODO: # Rotate 90-degrees clockwise once if White is on left side
@@ -74,3 +62,18 @@ class BoardState:
 
         # print(current_state)
         return current_state
+
+    def printMove(self, san_move):
+        if (self.board.turn == chess.WHITE):
+            print("{:3}.   {:7}".format(self.move_count, san_move), end='', flush=True)
+        else:
+            print("{:7}".format(san_move))
+            self.move_count = self.move_count + 1
+
+    def update(self, move):
+        if self.move_count == 1 and self.board.turn == chess.WHITE:
+            self.node = self.game.add_variation(move)
+        else:
+            self.node = self.node.add_variation(move)
+        self.board.push(move)
+        self.prev_state = self.current_state

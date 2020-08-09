@@ -1,0 +1,1 @@
+ONE_SQUARE_SIZE = 50
