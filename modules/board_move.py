@@ -1,8 +1,5 @@
 import chess
-import chess.pgn
 import numpy as np
-import tflite_runtime
-import tflite_runtime.interpreter as tflite
 
 class MoveHandler:
     def __init__(self, board):

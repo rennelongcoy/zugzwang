@@ -1,8 +1,8 @@
 import chess
 import chess.pgn
 import numpy as np
-import tflite_runtime
-import tflite_runtime.interpreter as tflite
+
+from .tflite_model import TfLiteModel
 
 class BoardState:
     def __init__(self, board):
@@ -20,27 +20,7 @@ class BoardState:
                                     [-1, -1, -1, -1, -1, -1, -1, -1]]) # Rank H
         self.move_num = 1
         self.current_state = self.prev_state
-        self.interpreter = tflite.Interpreter(model_path="/zugzwang/model/model.tflite")
-        self.interpreter.allocate_tensors()
-        
-        self.input_details = self.interpreter.get_input_details()
-        self.output_details = self.interpreter.get_output_details()
-        
-        #print(input_details[0]['dtype'])
-        self.count = self.input_details[0]['shape'][0] # Only 1 image to be input
-        self.height = self.input_details[0]['shape'][1]
-        self.width = self.input_details[0]['shape'][2]
-        self.depth = self.input_details[0]['shape'][3]
-        #print("Expected input count  = " + str(count))
-        #print("Expected input height = " + str(height))
-        #print("Expected input width  = " + str(width))
-        #print("Expected input depth  = " + str(depth))
-
-        #print(output_details[0]['dtype'])
-        self.rows = self.output_details[0]['shape'][0]
-        self.cols = self.output_details[0]['shape'][1]
-        #print("Expected output rows = " + str(rows))
-        #print("Expected output cols  = " + str(cols))
+        self.tflite_model = TfLiteModel()
 
     def setCurrentState(self, current_state):
         self.current_state = current_state
@@ -75,43 +55,33 @@ class BoardState:
         return self.board.turn == chess.WHITE
 
     def getBoardStateFromImage(self, raw_sample_frame):
-        temp = np.array([[ 0,  0,  0,  0,  0,  0,  0,  0],
-                        [ 0,  0,  0,  0,  0,  0,  0,  0],
-                        [ 0,  0,  0,  0,  0,  0,  0,  0],
-                        [ 0,  0,  0,  0,  0,  0,  0,  0],
-                        [ 0,  0,  0,  0,  0,  0,  0,  0],
-                        [ 0,  0,  0,  0,  0,  0,  0,  0],
-                        [ 0,  0,  0,  0,  0,  0,  0,  0],
-                        [ 0,  0,  0,  0,  0,  0,  0,  0]])
+        state_temp = np.array([[ 0,  0,  0,  0,  0,  0,  0,  0],
+                               [ 0,  0,  0,  0,  0,  0,  0,  0],
+                               [ 0,  0,  0,  0,  0,  0,  0,  0],
+                               [ 0,  0,  0,  0,  0,  0,  0,  0],
+                               [ 0,  0,  0,  0,  0,  0,  0,  0],
+                               [ 0,  0,  0,  0,  0,  0,  0,  0],
+                               [ 0,  0,  0,  0,  0,  0,  0,  0],
+                               [ 0,  0,  0,  0,  0,  0,  0,  0]])
 
         # Size (HxWxD) = (50x50x3)
         cv_img_400x400 = raw_sample_frame[40:440, 120:520]
 
-        # Split current frame to 8x8 individual squares
+        # Split current frame to 64 individual squares
+        # Infer piece color in each square by using TF Lite model
         for i in range(0, 351, 50):
             for j in range(0, 351, 50):
                 # Add N dimension to be (NxHxWxD) = (1x50x50x3)
                 one_square = np.expand_dims(cv_img_400x400[i:i+50, j:j+50, :], axis=0)
 
-                # Infer piece color in each square by using TF Lite model (start from Rank A to Rank H)
-                self.interpreter.set_tensor(self.input_details[0]['index'], one_square)
-                self.interpreter.invoke()
-                output_data = self.interpreter.get_tensor(self.output_details[0]['index'])
-                results = np.round(np.squeeze(output_data))
-
-                # Map neural network softmax output to corresponding class
-                if results[0] == 1:
-                    temp[i//50, j//50] = -1 # black
-                elif results[1] == 1:
-                    temp[i//50, j//50] = 0  # empty
-                elif results[2] == 1:
-                    temp[i//50, j//50] = 1  # white
+                # Classify piece color in the individual square
+                state_temp[i//50, j//50] = self.tflite_model.classifySquare(one_square)
 
         # Rotate 90-degrees clockwise thrice if White is on right side
         # TODO: # Rotate 90-degrees clockwise once if White is on left side
-        temp = np.rot90(m=temp, k=3)
+        state_temp = np.rot90(m=state_temp, k=3)
 
         # Flip in up-down direction to match initial_state
-        current_state = np.flipud(temp)
+        current_state = np.flipud(state_temp)
 
         return current_state

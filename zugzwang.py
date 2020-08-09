@@ -2,18 +2,15 @@ import chess
 import numpy as np
 import cv2
 
-from modules import boardstate
-from modules import movehandler
+from modules import board_move
+from modules import board_state
 
 print("zugzwang v0.01")
-#print("numpy.__version__          = " + np.__version__)
-#print("cv2.__version__            = " + cv2.__version__)
-#print("tflite_runtime.__version__ = " + tflite_runtime.__version__)
 
 if __name__ == "__main__":
     board = chess.Board()
-    boardState = boardstate.BoardState(board)
-    moveHandler = movehandler.MoveHandler(board)
+    boardState = board_state.BoardState(board)
+    moveHandler = board_move.MoveHandler(board)
 
     videoCapture = cv2.VideoCapture(0)
 
