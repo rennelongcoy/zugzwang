@@ -10,7 +10,7 @@ class MoveHandler:
         # Notation: (rank, file)
         # print("start_point = " + str(start_point))
         start_square = chess.square(start_point[1], start_point[0])
-        # print("start_square = " + str(chess.square_name(start_square)))
+        print("start_square = " + str(chess.square_name(start_square)))
         return start_square
 
     def getDestSquare(self, state_diff):
@@ -18,7 +18,7 @@ class MoveHandler:
         # Notation: (rank, file)
         # print("dest_point = " + str(dest_point))
         dest_square = chess.square(dest_point[1], dest_point[0])
-        # print("dest_square = " + str(chess.square_name(dest_square)))
+        print("dest_square = " + str(chess.square_name(dest_square)))
         return dest_square
 
     def convertToChessMove(self, start_square, dest_square):

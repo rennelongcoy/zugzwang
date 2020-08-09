@@ -16,11 +16,10 @@ if __name__ == "__main__":
 
     print("Press 'esc' to quit. Press ' ' to make a move.")
     print("Chess Game Record:")
-    move_num = 1
     while(True):
         # Capture frame-by-frame
         ret, frame = videoCapture.read()
-        raw_sample_frame = np.float32(frame.copy())
+        raw_frame = np.float32(frame.copy())
 
         # Overlay a red 400x400 square to match with real-world Chess board dimension
         frame_overlay = cv2.rectangle(frame, (120, 40), (520 - 1, 440 - 1), (0, 0, 255), 1)
@@ -33,7 +32,7 @@ if __name__ == "__main__":
             break
         elif key == ord(' '): # Space bar
             # Calculate difference between current and previous board
-            state_diff = boardState.getBoardStateDiff(raw_sample_frame)
+            state_diff = boardState.getBoardStateDiff(raw_frame)
 
             # Convert state diff to move
             (move, uci_move, san_move) = moveHandler.getMoveFromStateDiff(state_diff)

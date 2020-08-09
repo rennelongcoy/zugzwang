@@ -22,14 +22,8 @@ class BoardState:
         self.current_state = self.prev_state
         self.tflite_model = TfLiteModel()
 
-    def setCurrentState(self, current_state):
-        self.current_state = current_state
-
-    def setPrevState(self, prev_state):
-        self.prev_state = prev_state
-
-    def getBoardStateDiff(self, raw_sample_frame):
-        self.current_state = self.getBoardStateFromImage(raw_sample_frame)
+    def getBoardStateDiff(self, raw_frame):
+        self.current_state = self.getBoardStateFromImage(raw_frame)
         state_diff = self.current_state - self.prev_state
         if self.board.turn == chess.BLACK:
             state_diff = -state_diff
@@ -45,16 +39,13 @@ class BoardState:
         self.prev_state = self.current_state
 
     def printMove(self, san_move):
-        if (self.isWhitesTurn()):
+        if (self.board.turn == chess.WHITE):
             print("{:3}.   {:7}".format(self.move_num, san_move), end='', flush=True)
         else:
             print("{:7}".format(san_move))
             self.move_num = self.move_num + 1
 
-    def isWhitesTurn(self):
-        return self.board.turn == chess.WHITE
-
-    def getBoardStateFromImage(self, raw_sample_frame):
+    def getBoardStateFromImage(self, raw_frame):
         state_temp = np.array([[ 0,  0,  0,  0,  0,  0,  0,  0],
                                [ 0,  0,  0,  0,  0,  0,  0,  0],
                                [ 0,  0,  0,  0,  0,  0,  0,  0],
@@ -64,15 +55,15 @@ class BoardState:
                                [ 0,  0,  0,  0,  0,  0,  0,  0],
                                [ 0,  0,  0,  0,  0,  0,  0,  0]])
 
-        # Size (HxWxD) = (50x50x3)
-        cv_img_400x400 = raw_sample_frame[40:440, 120:520]
+        # Size (HxWxD) = (400x400x3)
+        img400x400 = raw_frame[40:440, 120:520]
 
         # Split current frame to 64 individual squares
         # Infer piece color in each square by using TF Lite model
         for i in range(0, 351, 50):
             for j in range(0, 351, 50):
                 # Add N dimension to be (NxHxWxD) = (1x50x50x3)
-                one_square = np.expand_dims(cv_img_400x400[i:i+50, j:j+50, :], axis=0)
+                one_square = np.expand_dims(img400x400[i:i+50, j:j+50, :], axis=0)
 
                 # Classify piece color in the individual square
                 state_temp[i//50, j//50] = self.tflite_model.classifySquare(one_square)
@@ -83,5 +74,5 @@ class BoardState:
 
         # Flip in up-down direction to match initial_state
         current_state = np.flipud(state_temp)
-
+        print(current_state)
         return current_state
