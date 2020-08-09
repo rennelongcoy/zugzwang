@@ -8,8 +8,7 @@ class BoardState:
     def __init__(self, board):
         self.board = board
         self.game = chess.pgn.Game()
-        self.isFirstMove = True
-        self.node = 0
+        self.tflite_model = TfLiteModel()
         self.prev_state = np.array([[ 1,  1,  1,  1,  1,  1,  1,  1],  # Rank A
                                     [ 1,  1,  1,  1,  1,  1,  1,  1],  # Rank B
                                     [ 0,  0,  0,  0,  0,  0,  0,  0],  # Rank C
@@ -18,9 +17,8 @@ class BoardState:
                                     [ 0,  0,  0,  0,  0,  0,  0,  0],  # Rank F
                                     [-1, -1, -1, -1, -1, -1, -1, -1],  # Rank G
                                     [-1, -1, -1, -1, -1, -1, -1, -1]]) # Rank H
-        self.move_num = 1
         self.current_state = self.prev_state
-        self.tflite_model = TfLiteModel()
+        self.move_count = 1
 
     def getBoardStateDiff(self, raw_frame):
         self.current_state = self.getBoardStateFromImage(raw_frame)
@@ -30,9 +28,8 @@ class BoardState:
         return state_diff
 
     def update(self, move):
-        if self.isFirstMove:
+        if self.move_count == 1 and self.board.turn == chess.WHITE:
             self.node = self.game.add_variation(move)
-            self.isFirstMove = False
         else:
             self.node = self.node.add_variation(move)
         self.board.push(move)
@@ -40,10 +37,10 @@ class BoardState:
 
     def printMove(self, san_move):
         if (self.board.turn == chess.WHITE):
-            print("{:3}.   {:7}".format(self.move_num, san_move), end='', flush=True)
+            print("{:3}.   {:7}".format(self.move_count, san_move), end='', flush=True)
         else:
             print("{:7}".format(san_move))
-            self.move_num = self.move_num + 1
+            self.move_count = self.move_count + 1
 
     def getBoardStateFromImage(self, raw_frame):
         state_temp = np.array([[ 0,  0,  0,  0,  0,  0,  0,  0],
@@ -74,5 +71,6 @@ class BoardState:
 
         # Flip in up-down direction to match initial_state
         current_state = np.flipud(state_temp)
-        print(current_state)
+
+        # print(current_state)
         return current_state
