@@ -1,7 +1,5 @@
-# TODO: Refactor to classes
-
-import numpy as np
 import cv2
+import numpy as np
 import os
 
 cap = cv2.VideoCapture(0)
@@ -34,17 +32,10 @@ while(True):
     if key == 27: # Esc key
         break
     elif key == ord(' '): # Space bar
-        #print(frame[40:440, 120:520].shape)
-        #print("Space bar pressed.")
         # Take sample data No. xx
         raw_sample_name = str(sample_num) + "-original.jpg"
-        #raw_sample_dir = dataset_dir + str(sample_num) + "/"
         raw_sample_dir = raw_dataset_dir + str(sample_num) + "/"
-        '''try:
-            os.mkdir(dataset_dir)
-            os.chmod(dataset_dir, 0o777)
-        except OSError as error:
-            print(error)'''
+
         try:
             os.mkdir(raw_sample_dir)
             os.chmod(raw_sample_dir, 0o777)
@@ -52,10 +43,6 @@ while(True):
             print(error)
         raw_sample_file = raw_sample_dir + raw_sample_name
         raw_overlay_file = raw_sample_dir + str(sample_num) + "-with-overlay.jpg"
-        #print("dataset_dir     = " + dataset_dir)
-        #print("raw_sample_dir  = " + raw_sample_dir)
-        #print("raw_sample_file = " + raw_sample_file)
-        #print("raw_overlay_file = " + raw_overlay_file)
 
         # Store the original image
         cv2.imwrite(raw_sample_file, raw_sample_frame)
@@ -66,7 +53,6 @@ while(True):
         cv_img_400x400 = raw_sample_frame[40:440, 120:520]
         for i in range(0, 351, 50):
             for j in range(0, 351, 50):
-                  #print('cv_img_400x400[' + str(i) + ':' + str(i+50) + ', ' + str(j) + ':' + str(j+50) + ']')
                   cv_save = cv_img_400x400[i:i+50, j:j+50, :]
                   cv2.imwrite(raw_sample_dir + str(sample_num) + '-' + str(round(i/50)) + '-' + str(round(j/50)) + '.jpg', cv_save)
         sample_num = sample_num + 1
