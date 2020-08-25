@@ -62,7 +62,7 @@ TODO
 
 - https://hub.docker.com/r/tensorflow/tensorflow/
 - docker pull tensorflow/tensorflow:latest-jupyter
-- docker run -it --rm -v /c/app:/tf/zugzwang -p 8888:8888 tensorflow/tensorflow:latest-jupyter
+- docker run -it --rm -v /c/zugzwang:/tf/zugzwang -p 8888:8888 tensorflow/tensorflow:latest-jupyter
     - Example:
 ![Sample Docker Container bootup](./docs/docker_container_bootup.png)
 
